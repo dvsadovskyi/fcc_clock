@@ -73,6 +73,9 @@
 #break-length {
   font-size: 1.5rem;
   margin: 20px;
+  width: 20%;
+  display: flex;
+  justify-content: center;
 }
 
 .timer {
@@ -108,4 +111,8 @@ footer {
 
 #time-left {
   font-size: 3rem;
+}
+
+i:active {
+  transform: scale(0.99);
 }
