@@ -1,57 +1,83 @@
 function App() {
-    const [time, setTime] = React.useState("swaped")
     const [breakTime, setBreakTime] = React.useState(5)
     const [sessionTime, setSessionTime] = React.useState(25)
     const [play, setPlay] = React.useState(false)
-    const [swap, setSwap] = React.useState(true)
+    const [leftTime, setLeftTime] = React.useState(25 * 60)
+    const [brstart, setBrstart] = React.useState(false)
+    const [countdown, setCountdown] = React.useState(false)
 
+    React.useEffect(() => {
+        let timerId
+        if (leftTime == 0) {
+            setLeftTime(breakTime * 60)
+        }
+        if (play) {
+            timerId = setInterval(() => {
+                setLeftTime(prev => prev - 1)
+            }, 1000);
+
+            return () => {
+                clearInterval(timerId)
+            }
+        }
+
+    }, [play, leftTime])
+
+
+    const formatTime = (time) => {
+        const minutes = Math.floor(time / 60);
+        const seconds = time % 60;
+        const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+        const formattedSeconds = seconds < 10 ? '0' + seconds : seconds;
+        return `${formattedMinutes}:${formattedSeconds}`;
+    };
+
+    function incBr() {
+        if (breakTime < 60) {
+            setBreakTime(prev => prev + 1)
+        };
+    };
 
     function decBr() {
-        if (!play) {
-            if (breakTime > 0) {
-                setBreakTime(prev => prev - 1)
-            }
-        }
+        if (breakTime > 1) {
+            setBreakTime(prev => prev - 1)
+        };
+    };
 
-    }
-    function incBr() {
-        if (!play) {
-            if (breakTime < 60) {
-                setBreakTime(prev => prev + 1)
-            }
-        }
-    }
+
+
+    function incSe() {
+        if (sessionTime < 60) {
+            setSessionTime(prev => prev + 1)
+        };
+    };
 
     function decSe() {
-        if (!play) {
-            setSwap(true)
-            if (sessionTime > 0) {
-                setSessionTime(prev => prev - 1)
+        if (sessionTime > 1) {
+            setSessionTime(prev => prev - 1)
+        };
+    };
 
-            }
-        }
-    }
-    function incSe() {
-        if (!play) {
-            setSwap(true)
-            if (sessionTime < 60) {
-                setSessionTime(prev => prev + 1)
-            }
-        }
-    }
 
     function handlePlay() {
-        setPlay(prev => !prev)
-        setSwap(false)
-    }
-
+        if (!countdown) {
+            setLeftTime(sessionTime * 60)
+            setCountdown(true)
+        } else {
+            setLeftTime(prev => prev)
+        }
+        setPlay(!play);
+    };
 
     function handleReset() {
+        setLeftTime(1500);
+        setBreakTime(5);
+        setSessionTime(25);
         setPlay(false)
-        setBreakTime(5)
-        setSessionTime(25)
-        setSwap(true)
+        setCountdown(false)
+
     }
+
     return (
         <div className="container">
             <div className="clock">
@@ -75,8 +101,8 @@ function App() {
                     </div>
                 </div>
                 <div className="timer">
-                    <div id="timer-label">Session</div>
-                    <div id="time-left">{swap ? sessionTime : time}</div>
+                    <div id="timer-label">{brstart ? "Break" : "Session"}</div>
+                    <div id="time-left">{formatTime(leftTime)}</div>
                 </div>
                 <div className="start-reset">
                     <div onClick={handlePlay} id="start_stop">
