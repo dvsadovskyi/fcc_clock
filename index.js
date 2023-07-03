@@ -8,20 +8,36 @@ function App() {
 
     React.useEffect(() => {
         let timerId
-        if (leftTime == 0) {
-            setLeftTime(breakTime * 60)
-        }
+
         if (play) {
             timerId = setInterval(() => {
                 setLeftTime(prev => prev - 1)
-            }, 1000);
+            }, 1);
 
             return () => {
                 clearInterval(timerId)
             }
         }
 
-    }, [play, leftTime])
+    }, [play])
+
+
+    React.useEffect(() => {
+        if (leftTime == 0) {
+            let aud = document.getElementById("beep")
+            aud.play()
+            if (brstart) {
+                setBrstart(false)
+                setLeftTime(sessionTime * 60)
+
+            } else {
+                setBrstart(true)
+                setLeftTime(breakTime * 60)
+            }
+        }
+
+    }, [leftTime])
+
 
 
     const formatTime = (time) => {
@@ -70,11 +86,14 @@ function App() {
     };
 
     function handleReset() {
-        setLeftTime(1500);
+        setLeftTime(25 * 60);
         setBreakTime(5);
         setSessionTime(25);
         setPlay(false)
         setCountdown(false)
+        let file = document.getElementById("beep")
+        file.pause()
+        file.currentTime = 0;
 
     }
 
